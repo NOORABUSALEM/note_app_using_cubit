@@ -2,6 +2,7 @@ import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
 class DatabaseHelper {
+  static const String noteTableKey = "Note";
   static final DatabaseHelper _instance = DatabaseHelper._();
 
   static DatabaseHelper get instance => _instance;
@@ -22,7 +23,7 @@ class DatabaseHelper {
   Future<Database> initDB() async {
     // Get a location using getDatabasesPath
     var databasesPath = await getDatabasesPath();
-    String path = join(databasesPath, 'note.db');
+    final path = join(databasesPath, 'note.db');
     // open the database
     final database = await openDatabase(
       path,
@@ -35,8 +36,8 @@ class DatabaseHelper {
   Future<void> _onCreate(Database db, int version) async {
     await db.execute(
       '''
-      CREATE TABLE Note (
-      id INTEGER PRIMARY KEY,
+      CREATE TABLE $noteTableKey (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
       title TEXT,
       description TEXT,
       colorCode TEXT

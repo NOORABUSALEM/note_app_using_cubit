@@ -18,6 +18,12 @@ class NoteModel {
         'colorCode': colorCode,
       };
 
+  Map<String, dynamic> toMapWithoutId() => {
+        'title': title,
+        'description': description,
+        'colorCode': colorCode,
+      };
+
   factory NoteModel.fromMap(Map<String, dynamic> map) {
     return NoteModel(
       id: map['id'] as int,
