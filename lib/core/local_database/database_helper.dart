@@ -24,13 +24,24 @@ class DatabaseHelper {
     var databasesPath = await getDatabasesPath();
     String path = join(databasesPath, 'note.db');
     // open the database
-    final database = await openDatabase(path, version: 1,
-        onCreate: (Database db, int version) async {
-      // When creating the db, create the table
-      await db.execute(
-        'CREATE TABLE Note (id INTEGER PRIMARY KEY, title TEXT, description TEXT, color TEXT)',
-      );
-    });
+    final database = await openDatabase(
+      path,
+      version: 1,
+      onCreate: _onCreate,
+    );
     return database;
+  }
+
+  Future<void> _onCreate(Database db, int version) async {
+    await db.execute(
+      '''
+      CREATE TABLE Note (
+      id INTEGER PRIMARY KEY,
+      title TEXT,
+      description TEXT,
+      colorCode TEXT
+      )
+     ''',
+    );
   }
 }
