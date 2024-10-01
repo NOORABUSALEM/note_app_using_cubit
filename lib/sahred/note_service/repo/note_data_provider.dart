@@ -11,14 +11,6 @@ class NoteDataProvider {
       note.toMapWithoutId(),
     );
     return result;
-    // final result = await db.rawInsert('''
-    // insert into ${DatabaseHelper.noteTableKey}
-    // (title, description, colorCode) values(?,?,?)
-    // ''', [
-    //   note.title,
-    //   note.description,
-    //   note.colorCode,
-    // ]);
   }
 
   Future<List<NoteModel>> fetch([int limit = 15]) async {
@@ -30,3 +22,11 @@ class NoteDataProvider {
     return result.map((e) => NoteModel.fromMap(e)).toList();
   }
 }
+// final result = await db.rawInsert('''
+// insert into ${DatabaseHelper.noteTableKey}
+// (title, description, colorCode) values(?,?,?)
+// ''', [
+//   note.title,
+//   note.description,
+//   note.colorCode,
+// ]);
