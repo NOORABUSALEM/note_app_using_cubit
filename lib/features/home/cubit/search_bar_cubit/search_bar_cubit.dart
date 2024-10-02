@@ -1,10 +1,14 @@
 import 'package:bloc/bloc.dart';
-import 'package:meta/meta.dart';
+import 'package:flutter/cupertino.dart';
 
 part 'search_bar_state.dart';
 
 class SearchBarCubit extends Cubit<SearchBarState> {
-  SearchBarCubit() : super(SearchBarHide());
+  SearchBarCubit() : super(SearchBarHide()) {
+    searchController = TextEditingController();
+  }
+
+  late final TextEditingController searchController;
 
   void show() {
     emit(SearchBarShow());

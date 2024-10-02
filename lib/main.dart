@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:note/core/theme/app_theme.dart';
+import 'package:note/features/note/presntation/note_screen.dart';
 
 import 'features/home/presntation/home_screen.dart';
 
@@ -14,8 +15,15 @@ class MainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: AppTheme.getTheme(context),
-      home: const HomeScreen(),
-
+      initialRoute: "/home",
+      routes: {
+        "/home": (context) {
+          return const HomeScreen();
+        },
+        "/note": (context) {
+          return const NoteScreen();
+        },
+      },
     );
   }
 }

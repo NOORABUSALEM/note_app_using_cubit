@@ -40,21 +40,9 @@ class HomeScreenView extends StatelessWidget {
             return switch (state) {
               // TODO: Handle this case.
               SearchBarShow() => AppBar(
-                  title: TextField(
-                    decoration: InputDecoration(
-                      suffixIcon: InkWell(
-                        onTap: () {
-                          context.read<SearchBarCubit>().hide();
-                        },
-                        child: const Icon(Icons.close),
-                      ),
-                      contentPadding: EdgeInsets.symmetric(vertical: 6,horizontal: 16),
-                      focusedBorder: searchBarStyle,
-                      enabledBorder: searchBarStyle,
-                      border: searchBarStyle,
-                      filled: true,
-                      fillColor: AppColors.darkBackGroundSearchBar,
-                    ),
+                  title: CustomSearchBar(
+                    controller:
+                        context.watch<SearchBarCubit>().searchController,
                   ),
                 ),
               // TODO: Handle this case.
@@ -106,6 +94,12 @@ class HomeScreenView extends StatelessWidget {
           ],
         ),
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.of(context).pushNamed("/note");
+        },
+        child: const Icon(Icons.add),
+      ),
     );
   }
 
@@ -155,6 +149,39 @@ class HomeScreenView extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+}
+
+class CustomSearchBar extends StatelessWidget {
+  const CustomSearchBar({
+    super.key,
+    this.controller,
+    this.onChanged,
+  });
+
+  final TextEditingController? controller;
+  final void Function(String)? onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return TextField(
+      controller: controller,
+      decoration: InputDecoration(
+        suffixIcon: InkWell(
+          onTap: () {
+            context.read<SearchBarCubit>().hide();
+          },
+          child: const Icon(Icons.close),
+        ),
+        contentPadding: const EdgeInsets.symmetric(vertical: 6, horizontal: 16),
+        focusedBorder: searchBarStyle,
+        enabledBorder: searchBarStyle,
+        border: searchBarStyle,
+        filled: true,
+        fillColor: AppColors.darkBackGroundSearchBar,
+      ),
+      onChanged: onChanged,
     );
   }
 }
