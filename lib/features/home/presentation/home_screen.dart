@@ -3,10 +3,13 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
+import 'package:note/core/extensions/build_context_extensions.dart';
+import 'package:note/core/routes/app_routes.dart';
 import 'package:note/core/styles/color_constants.dart';
 import 'package:note/core/styles/widget_styles.dart';
 import 'package:note/features/home/cubit/search_bar_cubit/search_bar_cubit.dart';
 import 'package:note/sahred/note_service/model/note_model.dart';
+import 'package:provider/provider.dart';
 
 const placeholderText =
     "Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a g";
@@ -96,7 +99,8 @@ class HomeScreenView extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.of(context).pushNamed("/note");
+          // context.read()
+          context.gotoNamed(AppRoutes.note);
         },
         child: const Icon(Icons.add),
       ),
