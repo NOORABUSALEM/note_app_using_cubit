@@ -1,7 +1,11 @@
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
+import 'package:note/core/styles/color_constants.dart';
+import 'package:note/core/styles/widget_styles.dart';
+import 'package:note/features/home/cubit/search_bar_cubit/search_bar_cubit.dart';
 import 'package:note/sahred/note_service/model/note_model.dart';
 
 const placeholderText =
@@ -12,55 +16,72 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          "Notes",
-          style: Theme.of(context).textTheme.titleLarge,
-        ),
-        actions: [
-          SearchAnchor(
-            builder: (context, controller) {
-              return IconButton(
-                onPressed: () {
-                  controller.openView();
-                },
-                icon: const Icon(Icons.search_outlined),
-              );
-              //   SearchBar(
-              //   elevation: const WidgetStatePropertyAll(0),
-              //   controller: controller,
-              //   padding: const WidgetStatePropertyAll(
-              //     EdgeInsets.symmetric(horizontal: 16.0),
-              //   ),
-              //   onTap: () {
-              //     controller.openView();
-              //   },
-              //   onChanged: (_) {
-              //     controller.openView();
-              //   },
-              //   leading: const Icon(Icons.search),
-              // );
-            },
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (context) => SearchBarCubit(),
+        )
+      ],
+      child: const HomeScreenView(),
+    );
+  }
+}
 
-            suggestionsBuilder: (context, controller) {
-              return List.generate(5, (int index) {
-                final String item = 'item $index';
-                return ListTile(
-                  title: Text(item),
-                  onTap: () {},
-                );
-              });
-            },
-          ),
-          const Gap(16),
-          IconButton(
-            onPressed: () {
-              showAboutInfoDialog(context);
-            },
-            icon: const Icon(Icons.info_outline),
-          ),
-        ],
+class HomeScreenView extends StatelessWidget {
+  const HomeScreenView({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(kToolbarHeight),
+        child: BlocBuilder<SearchBarCubit, SearchBarState>(
+          builder: (context, state) {
+            return switch (state) {
+              // TODO: Handle this case.
+              SearchBarShow() => AppBar(
+                  title: TextField(
+                    decoration: InputDecoration(
+                      suffixIcon: InkWell(
+                        onTap: () {
+                          context.read<SearchBarCubit>().hide();
+                        },
+                        child: const Icon(Icons.close),
+                      ),
+                      contentPadding: EdgeInsets.symmetric(vertical: 6,horizontal: 16),
+                      focusedBorder: searchBarStyle,
+                      enabledBorder: searchBarStyle,
+                      border: searchBarStyle,
+                      filled: true,
+                      fillColor: AppColors.darkBackGroundSearchBar,
+                    ),
+                  ),
+                ),
+              // TODO: Handle this case.
+              SearchBarHide() => AppBar(
+                  title: Text(
+                    "Notes",
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
+                  actions: [
+                    IconButton(
+                      onPressed: () {
+                        context.read<SearchBarCubit>().show();
+                      },
+                      icon: const Icon(Icons.search_outlined),
+                    ),
+                    const Gap(16),
+                    IconButton(
+                      onPressed: () {
+                        showAboutInfoDialog(context);
+                      },
+                      icon: const Icon(Icons.info_outline),
+                    ),
+                  ],
+                ),
+            };
+          },
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0),

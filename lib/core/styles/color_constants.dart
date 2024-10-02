@@ -8,4 +8,5 @@ class AppColors {
   static const darkTextColor = Colors.white;
   static final backGroundIconButton = Colors.grey[500];
   static const darkBackGroundIconButton = Color(0xFF3B3B3B);
+  static const darkBackGroundSearchBar = Color(0xFF3B3B3B);
 }
