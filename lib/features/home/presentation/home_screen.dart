@@ -4,12 +4,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
 import 'package:note/core/extensions/build_context_extensions.dart';
+import 'package:note/core/l10n_helper/cubit/l10n_lang_cubit.dart';
 import 'package:note/core/routes/app_routes.dart';
 import 'package:note/core/styles/color_constants.dart';
 import 'package:note/core/styles/widget_styles.dart';
 import 'package:note/features/home/cubit/search_bar_cubit/search_bar_cubit.dart';
 import 'package:note/sahred/note_service/model/note_model.dart';
-import 'package:provider/provider.dart';
 
 const placeholderText =
     "Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a g";
@@ -23,7 +23,10 @@ class HomeScreen extends StatelessWidget {
       providers: [
         BlocProvider(
           create: (context) => SearchBarCubit(),
-        )
+        ),
+        // BlocProvider(
+        //   create: (context) => L10nLangCubit(),
+        // ),
       ],
       child: const HomeScreenView(),
     );
@@ -41,17 +44,15 @@ class HomeScreenView extends StatelessWidget {
         child: BlocBuilder<SearchBarCubit, SearchBarState>(
           builder: (context, state) {
             return switch (state) {
-              // TODO: Handle this case.
               SearchBarShow() => AppBar(
                   title: CustomSearchBar(
                     controller:
                         context.watch<SearchBarCubit>().searchController,
                   ),
                 ),
-              // TODO: Handle this case.
               SearchBarHide() => AppBar(
                   title: Text(
-                    "Notes",
+                    context.l?.appTitle ?? "Title",
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
                   actions: [
@@ -64,7 +65,37 @@ class HomeScreenView extends StatelessWidget {
                     const Gap(16),
                     IconButton(
                       onPressed: () {
-                        showAboutInfoDialog(context);
+                        showDialog(
+                          context: context,
+                          builder: (context) {
+                            return Dialog(
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      context
+                                          .read<L10nLangCubit>()
+                                          .switchToEnglish();
+                                      context.back();
+                                    },
+                                    child: Text("English"),
+                                  ),
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      context
+                                          .read<L10nLangCubit>()
+                                          .switchToArabic();
+                                      context.back();
+                                    },
+                                    child: Text("Arabic"),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        );
+                        // showAboutInfoDialog(context);
                       },
                       icon: const Icon(Icons.info_outline),
                     ),
@@ -99,7 +130,7 @@ class HomeScreenView extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // context.read()
+          // AppRoutes.of(context).toNamed(AppRoutes.note);
           context.gotoNamed(AppRoutes.note);
         },
         child: const Icon(Icons.add),

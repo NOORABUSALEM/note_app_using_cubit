@@ -1,0 +1,8 @@
+{
+  "@@locale": "ar",
+  "appTitle": "مذكرة",
+  "@appTitle": {
+    "description": "Main application title"
+  },
+  "welcome": "مرحباً!"
+}

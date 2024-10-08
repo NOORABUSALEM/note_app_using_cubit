@@ -1,8 +1,10 @@
-class NoteModel {
+import 'package:equatable/equatable.dart';
+
+class NoteModel extends Equatable {
   final int? id;
   final String? title;
   final String? description;
-  final String? colorCode;
+  final int? colorCode;
 
   const NoteModel({
     this.id,
@@ -29,7 +31,16 @@ class NoteModel {
       id: map['id'] as int,
       title: map['title'] as String,
       description: map['description'] as String,
-      colorCode: map['colorCode'] as String,
+      colorCode: map['colorCode'] as int,
     );
   }
+
+  @override
+  // TODO: implement props
+  List<Object?> get props => [
+        id,
+        title,
+        description,
+        colorCode,
+      ];
 }

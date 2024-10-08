@@ -40,7 +40,7 @@ class DatabaseHelper {
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       title TEXT,
       description TEXT,
-      colorCode TEXT
+      colorCode INTEGER
       )
      ''',
     );
