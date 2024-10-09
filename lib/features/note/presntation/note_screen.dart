@@ -17,10 +17,10 @@ class NoteScreen extends StatelessWidget {
           create: (context) => EditNoteCubit(),
         ),
         BlocProvider(
-          create: (context) => NoteCubit(),
+          create: (context) => AlertNoteCubit(),
         ),
         BlocProvider(
-          create: (context) => AlertNoteCubit(),
+          create: (context) => NoteCubit(),
         ),
       ],
       child: const NoteScreenView(),
@@ -41,7 +41,6 @@ class NoteScreenView extends StatelessWidget {
         child: BlocBuilder<EditNoteCubit, EditNoteState>(
             builder: (context, state) {
           return switch (state) {
-            // TODO: Handle this case.
             EditNoteEdit() => AppBar(
                 leading: const Padding(
                   padding: EdgeInsets.all(8.0),
@@ -57,14 +56,13 @@ class NoteScreenView extends StatelessWidget {
                   const Gap(16),
                   IconButton(
                     onPressed: () {
-                      context.read<NoteCubit>().createNote();
+                      context.read<NoteCubit>().onSaveButtonSubmitted();
                     },
                     icon: const Icon(Icons.save),
                   ),
                   const Gap(16),
                 ],
               ),
-            // TODO: Handle this case.
             EditNoteWatch() => AppBar(
                 leading: const Padding(
                   padding: EdgeInsets.all(8.0),
@@ -87,45 +85,45 @@ class NoteScreenView extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            MultiBlocListener(
-              listeners: [
-                BlocListener<AlertNoteCubit, AlertNoteState>(
-                  listener: (context, state) {},
-                ),
-                BlocListener<NoteCubit, NoteState>(
-                  listener: (context, state) {
-                    final alertCubit = context.read<AlertNoteCubit>();
-                    switch (state) {
-                      case NoteInitial():
-                        alertCubit.init();
-                        break;
-                      case NoteLoading():
-                        alertCubit.loading();
-                        break;
-                      case NoteSuccess():
-                        alertCubit.success("Alert created successfully.");
-                        break;
-                      case NoteError():
-                        alertCubit.error(state.message);
-                        break;
-                    }
-                  },
-                ),
-              ],
-              child: Builder(builder: (context) {
-                final alertCubitState = context.watch<AlertNoteCubit>().state;
-                return switch (alertCubitState) {
+            BlocListener<NoteCubit, NoteState>(
+              listener: (context, state) {
+                switch (state) {
+                  case NoteInitial():
+                    context.read<AlertNoteCubit>().init();
+                    break;
+                  case NoteLoading():
+                    context.read<AlertNoteCubit>().loading();
+                    break;
+                  case NoteSuccess():
+                    context
+                        .read<AlertNoteCubit>()
+                        .success("Alert created successfully.");
+                    break;
+                  case NoteError():
+                    context.read<AlertNoteCubit>().error(state.message);
+                    break;
+                }
+              },
+              child: BlocBuilder<AlertNoteCubit, AlertNoteState>(
+                  builder: (context, state) {
+                print("Hello world");
+
+                return switch (state) {
                   AlertNoteInitial() => const SizedBox.shrink(),
                   AlertNoteLoading() => const Center(
                       child: CircularProgressIndicator(),
                     ),
                   AlertNoteSuccess() => StatusMessageWidget.success(
-                      message: alertCubitState.message,
-                      onPressed: () {},
+                      message: state.message,
+                      onPressed: () {
+                        context.read<AlertNoteCubit>().init();
+                      },
                     ),
                   AlertNoteError() => StatusMessageWidget.error(
-                      message: alertCubitState.message,
-                      onPressed: () {},
+                      message: state.message,
+                      onPressed: () {
+                        context.read<AlertNoteCubit>().init();
+                      },
                     ),
                 };
               }),
@@ -137,7 +135,7 @@ class NoteScreenView extends StatelessWidget {
                 builder: (context, state) {
                   return TextField(
                     controller: context.watch<NoteCubit>().titleController,
-                    readOnly: context.watch<EditNoteCubit>().state.readonly,
+                    readOnly: state.readonly,
                     maxLines: 10,
                     style: Theme.of(context).textTheme.headlineLarge,
                   );
@@ -151,7 +149,7 @@ class NoteScreenView extends StatelessWidget {
                   return TextField(
                     controller:
                         context.watch<NoteCubit>().descriptionController,
-                    readOnly: context.watch<EditNoteCubit>().state.readonly,
+                    readOnly: state.readonly,
                     maxLines: 20,
                     style: Theme.of(context).textTheme.bodyLarge,
                   );

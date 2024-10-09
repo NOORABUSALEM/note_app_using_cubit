@@ -3,11 +3,14 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gap/gap.dart';
+import 'package:get_it/get_it.dart';
 import 'package:note/core/extensions/build_context_extensions.dart';
 import 'package:note/core/l10n_helper/cubit/l10n_lang_cubit.dart';
 import 'package:note/core/routes/app_routes.dart';
+import 'package:note/core/shared_data_services/shared_data_services.dart';
 import 'package:note/core/styles/color_constants.dart';
 import 'package:note/core/styles/widget_styles.dart';
+import 'package:note/features/home/cubit/notes_cubit/notes_cubit.dart';
 import 'package:note/features/home/cubit/search_bar_cubit/search_bar_cubit.dart';
 import 'package:note/sahred/note_service/model/note_model.dart';
 
@@ -24,9 +27,9 @@ class HomeScreen extends StatelessWidget {
         BlocProvider(
           create: (context) => SearchBarCubit(),
         ),
-        // BlocProvider(
-        //   create: (context) => L10nLangCubit(),
-        // ),
+        BlocProvider(
+          create: (context) => NotesCubit(),
+        ),
       ],
       child: const HomeScreenView(),
     );
@@ -105,27 +108,57 @@ class HomeScreenView extends StatelessWidget {
           },
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            const Gap(16),
-            Expanded(
-              child: ListView.separated(
-                itemBuilder: (context, index) {
-                  return const NoteCard(
-                    note: NoteModel(),
-                  );
+      body: RefreshIndicator(
+        onRefresh: () async {
+          context.read<NotesCubit>().fetchNotes();
+        },
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const Gap(16),
+              BlocBuilder<NotesCubit, NotesState>(
+                builder: (context, state) {
+                  return switch (state) {
+                    NotesInitial() => const SizedBox.shrink(),
+                    NotesLoading() =>
+                      const Center(child: CircularProgressIndicator()),
+                    NotesSuccess() => Expanded(
+                        child: ListView.separated(
+                          itemBuilder: (context, index) {
+                            final note = state.notes[index];
+                            return NoteCard(
+                              note: note,
+                              onPressed: () {
+                                GetIt.I<SharedDataServices>().note = note;
+                                context.gotoNamed(AppRoutes.note).then(
+                                  (value) {
+                                    GetIt.I<SharedDataServices>().note =
+                                        NoteModel.empty;
+                                  },
+                                );
+                              },onRemove: () {
+                                context.read<NotesCubit>().deleteNote(note);
+                              },
+                            );
+                          },
+                          separatorBuilder: (context, index) {
+                            return const Gap(16);
+                          },
+                          itemCount: state.notes.length,
+                        ),
+                      ),
+                    NotesError() => Center(
+                        child: Text(state.message,
+                            style: Theme.of(context).textTheme.titleLarge),
+                      ),
+                  };
                 },
-                separatorBuilder: (context, index) {
-                  return const Gap(16);
-                },
-                itemCount: 10,
-              ),
-            ),
-          ],
+              )
+            ],
+          ),
         ),
       ),
       floatingActionButton: FloatingActionButton(
@@ -222,29 +255,42 @@ class CustomSearchBar extends StatelessWidget {
 }
 
 class NoteCard extends StatelessWidget {
-  const NoteCard({
-    super.key,
-    required this.note,
-  });
+  const NoteCard(
+      {super.key, required this.note, this.onPressed, this.onRemove});
 
+  final void Function()? onPressed;
+  final void Function()? onRemove;
   final NoteModel note;
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      color: Color.fromARGB(
-        math.Random.secure().nextInt(255),
-        math.Random.secure().nextInt(255),
-        math.Random.secure().nextInt(255),
-        math.Random.secure().nextInt(255),
-      ),
-      margin: const EdgeInsets.symmetric(horizontal: 0),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: ListTile(
-          title: Text(
-            note.title ?? placeholderText,
-            style: Theme.of(context).textTheme.headlineSmall,
+    return InkWell(
+      onTap: onPressed,
+      child: Card(
+        color: note.colorCode != null
+            ? Color(note.colorCode!)
+            : Color.fromARGB(
+                math.Random.secure().nextInt(255),
+                math.Random.secure().nextInt(255),
+                math.Random.secure().nextInt(255),
+                math.Random.secure().nextInt(255),
+              ),
+        margin: const EdgeInsets.symmetric(horizontal: 0),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: ListTile(
+            title: Text(
+              note.title ?? placeholderText,
+              style: Theme.of(context).textTheme.headlineSmall,
+            ),
+            trailing: InkWell(
+              onTap: onRemove,
+              child: Icon(
+                Icons.delete_forever_outlined,
+                color: Colors.redAccent,
+                size: 35,
+              ),
+            ),
           ),
         ),
       ),

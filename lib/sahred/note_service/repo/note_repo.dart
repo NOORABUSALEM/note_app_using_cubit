@@ -10,6 +10,14 @@ class NoteRepo {
     return noteDataProvider.create(note);
   }
 
+  Future<int> update(NoteModel note) async {
+    return noteDataProvider.update(note);
+  }
+
+  Future<int> delete(NoteModel note) async {
+    return noteDataProvider.delete(note);
+  }
+
   Future<List<NoteModel>> fetch([int limit = 15]) async {
     return await noteDataProvider.fetch(limit);
   }

@@ -13,6 +13,28 @@ class NoteDataProvider {
     return result;
   }
 
+  Future<int> update(NoteModel note) async {
+    print('NoteDataProvider.update: note.id: ${note.id}');
+    final db = await localClient.database;
+    final result = await db.update(
+      DatabaseHelper.noteTableKey,
+      note.toMapWithoutId(),
+      where: "id = ?",
+      whereArgs: [note.id],
+    );
+    return result;
+  }
+  Future<int> delete(NoteModel note) async {
+    print('NoteDataProvider.update: note.id: ${note.id}');
+    final db = await localClient.database;
+    final result = await db.delete(
+      DatabaseHelper.noteTableKey,
+      where: "id = ?",
+      whereArgs: [note.id],
+    );
+    return result;
+  }
+
   Future<List<NoteModel>> fetch([int limit = 15]) async {
     final db = await localClient.database;
     final result = await db.query(

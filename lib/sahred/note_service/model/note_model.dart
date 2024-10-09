@@ -5,6 +5,7 @@ class NoteModel extends Equatable {
   final String? title;
   final String? description;
   final int? colorCode;
+  static const empty = NoteModel();
 
   const NoteModel({
     this.id,

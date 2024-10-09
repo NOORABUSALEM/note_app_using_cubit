@@ -9,6 +9,15 @@ final class NoteInitial extends NoteState {
   List<Object?> get props => [];
 }
 
+// final class NoteEditing extends NoteState {
+//   final NoteModel note;
+//
+//   NoteEditing(this.note);
+//
+//   @override
+//   List<Object?> get props => [note];
+// }
+
 final class NoteLoading extends NoteState {
   @override
   // TODO: implement props

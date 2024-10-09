@@ -11,7 +11,7 @@ class AlertNoteCubit extends Cubit<AlertNoteState> {
   }
 
   void error(String message) {
-    emit(AlertNoteSuccess(message));
+    emit(AlertNoteError(message));
   }
 
   void loading() {
